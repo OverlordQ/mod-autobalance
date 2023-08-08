@@ -2849,8 +2849,10 @@ public:
         uint32 prevMaxPower = creature->GetMaxPower(POWER_MANA);
         uint32 prevHealth = creature->GetHealth();
         uint32 prevPower = creature->GetPower(POWER_MANA);
+        
         uint32 prevPlayerDamageRequired = creature->GetPlayerDamageReq();
-
+        uint32 prevCreateHealth = creature->GetCreateHealth();
+        
         Powers pType= creature->getPowerType();
 
         creature->SetArmor(newBaseArmor);
@@ -2876,24 +2878,24 @@ public:
         else
             creature->setPowerType(pType); // fix creatures with different power types
 
-        LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: Creature {} HP {}/{} => {}/{}", creature->GetName(), prevHealth, prevMaxHealth, scaledCurHealth, scaledHealth);
+        LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: Creature {} HP {}/{} => {}/{} | Prev HP Max: {}", creature->GetName(), prevHealth, prevMaxHealth, scaledCurHealth, scaledHealth, prevCreateHealth);
         uint32 playerDamageRequired = creature->GetPlayerDamageReq();
-        LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: pPDR {} - cPDR {} - psPDR {}", prevPlayerDamageRequired, playerDamageRequired, creatureABInfo->PreviousScaledPDR);
+        LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: pPDR {} - cPDR {}", prevPlayerDamageRequired, playerDamageRequired);
         
         if(prevPlayerDamageRequired == 0)
         {
             // If already reached damage threshold for loot, drop to zero again
+            LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: Creature {} already damaged >50% by player", creature->GetName());
             creature->LowerPlayerDamageReq(playerDamageRequired, true);
         }
         else
         {
             // Scale the damage requirements similar to creature HP
-            uint32 scaledPlayerDmgReq = creatureABInfo->PreviousScaledPDR == 0 ? playerDamageRequired : float(prevPlayerDamageRequired) * float(playerDamageRequired) / float(creatureABInfo->PreviousScaledPDR);
+            uint32 scaledPlayerDmgReq = float(prevPlayerDamageRequired) * float(playerDamageRequired) / float(creatureABInfo->PreviousScaledPDR);
             LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: sPDR {}", scaledPlayerDmgReq);
             
             // Do some math
             // creature->LowerPlayerDamageReq(playerDamageRequired - scaledPlayerDmgReq, true);
-            creatureABInfo->PreviousScaledPDR = scaledPlayerDmgReq;
         }
 
         //
