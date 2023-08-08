@@ -2890,8 +2890,8 @@ public:
         }
         else
         {
-            // Scale the damage requirements similar to creature HP
-            uint32 scaledPlayerDmgReq = float(prevPlayerDamageRequired) * float(playerDamageRequired) / float(creatureABInfo->PreviousScaledPDR);
+            // Scale the damage requirements similar to creature HP scaling
+            uint32 scaledPlayerDmgReq = float(prevPlayerDamageRequired) * float(scaledHealth) / float(prevCreateHealth);
             LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: sPDR {}", scaledPlayerDmgReq);
             
             // Do some math
