@@ -135,6 +135,8 @@ public:
     bool isActive = false;
     bool wasAliveNowDead = false;
     bool isInCreatureList = false;
+
+    uint32 PreviousScaledPDR = 0;
 };
 
 class AutoBalanceMapInfo : public DataMap::Base
@@ -2864,6 +2866,7 @@ public:
         creature->SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, (float)scaledMana);
         creatureABInfo->DamageMultiplier = damageMul;
         creatureABInfo->CCDurationMultiplier = ccDurationMul;
+        creatureABInfo->PreviousScaledPDR = creature->GetPlayerDamageReq();
 
         uint32 scaledCurHealth=prevHealth && prevMaxHealth ? float(scaledHealth)/float(prevMaxHealth)*float(prevHealth) : 0;
         uint32 scaledCurPower=prevPower && prevMaxPower  ? float(scaledMana)/float(prevMaxPower)*float(prevPower) : 0;
@@ -2876,18 +2879,18 @@ public:
 
         LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: Creature {} HP {}/{} => {}/{}", creature->GetName(), prevHealth, prevMaxHealth, scaledCurHealth, scaledHealth);
         uint32 playerDamageRequired = creature->GetPlayerDamageReq();
-        LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: pPDR {} - cPDR {}", prevPlayerDamageRequired, playerDamageRequired);
+        LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: pPDR {} - cPDR {} - psPDR {}", prevPlayerDamageRequired, playerDamageRequired, creatureABInfo->PreviousScaledPDR);
         
         if(prevPlayerDamageRequired == 0)
         {
             // If already reached damage threshold for loot, drop to zero again
             creature->LowerPlayerDamageReq(playerDamageRequired, true);
-            
         }
         else
         {
             // Scale the damage requirements similar to creature HP
-            uint32 scaledPlayerDmgReq=prevPlayerDamageRequired && prevMaxHealth ? float(prevPlayerDamageRequired)/float(prevHealth)*float(scaledHealth) : 0;
+            
+            uint32 scaledPlayerDmgReq=prevPlayerDamageRequired && prevMaxHealth ? float(prevPlayerDamageRequired) /float(prevHealth)*float(scaledHealth) : 0;
             LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: sPDR {}", scaledPlayerDmgReq);
             
             // Do some math
