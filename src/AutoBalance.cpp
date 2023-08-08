@@ -2893,7 +2893,7 @@ public:
             
             // Do some math
             // creature->LowerPlayerDamageReq(playerDamageRequired - scaledPlayerDmgReq, true);
-            creatureABInfo->PreviousScaledPDR = prevPlayerDamageRequired;
+            creatureABInfo->PreviousScaledPDR = scaledPlayerDmgReq;
         }
 
         //
