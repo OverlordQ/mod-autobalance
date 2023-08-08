@@ -2866,7 +2866,6 @@ public:
         creature->SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, (float)scaledMana);
         creatureABInfo->DamageMultiplier = damageMul;
         creatureABInfo->CCDurationMultiplier = ccDurationMul;
-        creatureABInfo->PreviousScaledPDR = creature->prevPlayerDamageRequired;
 
         uint32 scaledCurHealth=prevHealth && prevMaxHealth ? float(scaledHealth)/float(prevMaxHealth)*float(prevHealth) : 0;
         uint32 scaledCurPower=prevPower && prevMaxPower  ? float(scaledMana)/float(prevMaxPower)*float(prevPower) : 0;
@@ -2889,12 +2888,12 @@ public:
         else
         {
             // Scale the damage requirements similar to creature HP
-            
-            uint32 scaledPlayerDmgReq=prevPlayerDamageRequired && prevMaxHealth ? float(prevPlayerDamageRequired) /float(prevHealth)*float(scaledHealth) : 0;
+            uint32 scaledPlayerDmgReq = creatureABInfo->PreviousScaledPDR == 0 ? playerDamageRequired : float(prevPlayerDamageRequired) * float(playerDamageRequired) / float(creatureABInfo->PreviousScaledPDR);
             LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: sPDR {}", scaledPlayerDmgReq);
             
             // Do some math
             // creature->LowerPlayerDamageReq(playerDamageRequired - scaledPlayerDmgReq, true);
+            creatureABInfo->PreviousScaledPDR = prevPlayerDamageRequired;
         }
 
         //
