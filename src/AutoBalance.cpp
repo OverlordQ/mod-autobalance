@@ -135,8 +135,6 @@ public:
     bool isActive = false;
     bool wasAliveNowDead = false;
     bool isInCreatureList = false;
-
-    uint32 PreviousScaledPDR = 0;
 };
 
 class AutoBalanceMapInfo : public DataMap::Base
@@ -2878,24 +2876,18 @@ public:
         else
             creature->setPowerType(pType); // fix creatures with different power types
 
-        LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: Creature {} HP {}/{} => {}/{} | Prev HP Max: {}", creature->GetName(), prevHealth, prevMaxHealth, scaledCurHealth, scaledHealth, prevCreateHealth);
-        uint32 playerDamageRequired = creature->GetPlayerDamageReq();
-        LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: pPDR {} - cPDR {}", prevPlayerDamageRequired, playerDamageRequired);
-        
+        uint32 playerDamageRequired = creature->GetPlayerDamageReq();        
         if(prevPlayerDamageRequired == 0)
         {
             // If already reached damage threshold for loot, drop to zero again
-            LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: Creature {} already damaged >50% by player", creature->GetName());
             creature->LowerPlayerDamageReq(playerDamageRequired, true);
         }
         else
         {
             // Scale the damage requirements similar to creature HP scaling
             uint32 scaledPlayerDmgReq = float(prevPlayerDamageRequired) * float(scaledHealth) / float(prevCreateHealth);
-            LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: sPDR {}", scaledPlayerDmgReq);
-            
             // Do some math
-            // creature->LowerPlayerDamageReq(playerDamageRequired - scaledPlayerDmgReq, true);
+            creature->LowerPlayerDamageReq(playerDamageRequired - scaledPlayerDmgReq, true);
         }
 
         //
