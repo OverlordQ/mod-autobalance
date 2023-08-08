@@ -2894,7 +2894,7 @@ public:
             LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: sPDR {}", scaledPlayerDmgReq);
             
             // Do some math
-            creature->LowerPlayerDamageReq(playerDamageRequired - scaledPlayerDmgReq, true);
+            // creature->LowerPlayerDamageReq(playerDamageRequired - scaledPlayerDmgReq, true);
         }
 
         //
