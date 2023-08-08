@@ -2874,16 +2874,22 @@ public:
         else
             creature->setPowerType(pType); // fix creatures with different power types
 
+        LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: Creature {} HP {}/{} => {}/{}", creature->GetName(), prevHealth, prevMaxHealth, scaledCurHealth, scaledHealth);
         uint32 playerDamageRequired = creature->GetPlayerDamageReq();
+        LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: pPDR {} - cPDR {}", prevPlayerDamageRequired, playerDamageRequired);
+        
         if(prevPlayerDamageRequired == 0)
         {
             // If already reached damage threshold for loot, drop to zero again
             creature->LowerPlayerDamageReq(playerDamageRequired, true);
+            
         }
         else
         {
             // Scale the damage requirements similar to creature HP
-            uint32 scaledPlayerDmgReq=prevPlayerDamageRequired && prevMaxHealth ? float(prevPlayerDamageRequired)/float(prevMaxHealth)*float(prevHealth) : 0;
+            uint32 scaledPlayerDmgReq=prevPlayerDamageRequired && prevMaxHealth ? float(prevPlayerDamageRequired)/float(prevHealth)*float(scaledHealth) : 0;
+            LOG_DEBUG("module.AutoBalance", "AutoBalance_AllCreatureScript::ModifyCreatureAttributes: sPDR {}", scaledPlayerDmgReq);
+            
             // Do some math
             creature->LowerPlayerDamageReq(playerDamageRequired - scaledPlayerDmgReq, true);
         }
