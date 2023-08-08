@@ -2866,7 +2866,7 @@ public:
         creature->SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, (float)scaledMana);
         creatureABInfo->DamageMultiplier = damageMul;
         creatureABInfo->CCDurationMultiplier = ccDurationMul;
-        creatureABInfo->PreviousScaledPDR = creature->GetPlayerDamageReq();
+        creatureABInfo->PreviousScaledPDR = creature->prevPlayerDamageRequired;
 
         uint32 scaledCurHealth=prevHealth && prevMaxHealth ? float(scaledHealth)/float(prevMaxHealth)*float(prevHealth) : 0;
         uint32 scaledCurPower=prevPower && prevMaxPower  ? float(scaledMana)/float(prevMaxPower)*float(prevPower) : 0;
